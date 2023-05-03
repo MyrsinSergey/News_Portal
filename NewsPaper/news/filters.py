@@ -1,7 +1,6 @@
 from django_filters import FilterSet, ModelChoiceFilter, DateFilter, CharFilter
 from django import forms
-from django_filters.widgets import RangeWidget
-from .models import Author, Category, Post, PostCategory, Comment
+from .models import Author
 
 
 class PostFilter(FilterSet):

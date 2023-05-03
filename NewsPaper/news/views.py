@@ -109,6 +109,7 @@ class ArticlesCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         post = form.save(commit=False)
         post.post_choice = 'ART'
+        self.object.post_author = Author.objects.get(author_name_id=self.request.user.id)
         return super().form_valid(form)
 
 class NewsUpdate(PermissionRequiredMixin, UpdateView):

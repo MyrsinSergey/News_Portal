@@ -53,6 +53,9 @@ class Post(models.Model):
     def preview(self):
         return self.post_text[0:124] + '...'
 
+    def get_absolute_url(self):
+        return f'/news/{self.id}'
+
     def __str__(self):
         return f'{self.post_title.title()}: {self.post_text[:20]}'
 
