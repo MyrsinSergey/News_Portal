@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2><p>Подтвердите, что вы хотите войти в систему, используя свою учетную запись Google:</p></h2>
+{% load socialaccount %}
+<form method="POST" action="{% url 'socialaccount_login'%}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary btn-block">
+        <i class="fab fa-google"></i> Войти через Google
+    </button>
+</form>
+{% endblock %}

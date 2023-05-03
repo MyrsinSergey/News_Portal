@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Выход из системы.</h1>
+    <p>Спасибо, что посетили наш сайт. Возвращайтесь скорее!.</p>
+    <form method="POST" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Выйти</button>
+    </form>
+{% endblock %}

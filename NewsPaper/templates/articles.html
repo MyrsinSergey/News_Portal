@@ -1,0 +1,19 @@
+{% extends 'flatpages/default.html' %}
+{% load censor %}
+
+{% block title %}
+<h1>{{ articles.post_title }}</h1>
+{% endblock title %}
+
+
+{% block content %}
+<h1>{{ articles.post_title|censor }}</h1>
+<h3>Дата публикации: {{ articles.post_date|date:'d.m.Y' }}</h3>
+<h3>{{ articles.post_text|censor }}</h3>
+
+{% if is_not_authors %}
+{% else %}
+<a class="nav-link" href="{% url 'articles_update' pk=articles.id %}">Редактировать</a>
+<a class="nav-link" href="{% url 'articles_delete' pk=articles.id %}">Удалить</a>
+{% endif %}
+{% endblock content %}
