@@ -7,6 +7,8 @@ from .filters import PostFilter
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from .tasks import send_email_task
+
 
 
 class NewsList(LoginRequiredMixin, ListView):
@@ -19,6 +21,7 @@ class NewsList(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['is_not_authors'] = not self.request.user.groups.filter(name = 'authors').exists()
         return context
+
 
 
 class ArticlesList(LoginRequiredMixin, ListView):
@@ -93,9 +96,11 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
     permission_required = ('news.add_post')
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.post_choice = 'NEW'
-        self.object.post_author = Author.objects.get(author_name_id=self.request.user.id)
+        post = form.save(commit=False)
+        post.post_choice = 'NEW'
+        post.post_author = Author.objects.get(author_name_id=self.request.user.id)
+        post.save()
+        send_email_task.delay(post.pk)
         return super().form_valid(form)
 
 class ArticlesCreate(PermissionRequiredMixin, CreateView):
@@ -109,7 +114,9 @@ class ArticlesCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         post = form.save(commit=False)
         post.post_choice = 'ART'
-        self.object.post_author = Author.objects.get(author_name_id=self.request.user.id)
+        post.post_author = Author.objects.get(author_name_id=self.request.user.id)
+        post.save()
+        send_email_task.delay(post.pk)
         return super().form_valid(form)
 
 class NewsUpdate(PermissionRequiredMixin, UpdateView):
