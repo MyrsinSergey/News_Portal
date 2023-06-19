@@ -8,6 +8,8 @@ from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from .tasks import send_email_task
+from django.core.cache import cache
+
 
 
 
@@ -54,6 +56,17 @@ class ArticlesDetail(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['is_not_authors'] = not self.request.user.groups.filter(name = 'authors').exists()
         return context
+
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+        obj = cache.get(f'articles-{self.kwargs["pk"]}',
+                        None)  # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'articles-{self.kwargs["pk"]}', obj)
+
+        return obj
 
 class NewsSearch(LoginRequiredMixin, ListView):
     queryset = Post.objects.filter(post_choice='NEW').order_by('-post_date')
